@@ -1,12 +1,13 @@
-use std::net::SocketAddr;
 use std::ops::DerefMut;
 use std::sync::{Arc, Mutex};
+
 
 use env_logger::Env;
 use tokio;
 use tokio::codec::Decoder;
 use tokio::io;
-use tokio::net::TcpListener;
+
+use tokio::net::UnixListener;
 use tokio::prelude::*;
 
 use crate::codec::ABCICodec;
@@ -14,14 +15,14 @@ use crate::messages::abci::*;
 use crate::Application;
 
 /// Creates the TCP server and listens for connections from Tendermint
-pub fn serve<A>(app: A, addr: SocketAddr) -> io::Result<()>
+pub fn serve<A>(app: A, addr: &str) -> io::Result<()>
 where
     A: Application + 'static + Send + Sync,
 {
     env_logger::from_env(Env::default().default_filter_or("info"))
         .try_init()
         .ok();
-    let listener = TcpListener::bind(&addr).unwrap();
+    let listener = UnixListener::bind(&addr).unwrap();
     let incoming = listener.incoming();
     let app = Arc::new(Mutex::new(app));
     let server = incoming

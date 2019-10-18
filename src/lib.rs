@@ -30,7 +30,7 @@ extern crate core;
 extern crate protobuf;
 extern crate tokio;
 
-use std::net::SocketAddr;
+
 
 pub use crate::messages::abci::*;
 pub use crate::messages::merkle::*;
@@ -108,12 +108,12 @@ pub fn run_local<A>(app: A)
 where
     A: Application + 'static + Send + Sync,
 {
-    let addr = "127.0.0.1:26658".parse().unwrap();
+    let addr = "tcp://127.0.0.1:26658";
     run(addr, app);
 }
 
 /// Setup the application and start the server. Use this fn when setting different ip:port.
-pub fn run<A>(listen_addr: SocketAddr, app: A)
+pub fn run<A>(listen_addr: &str, app: A)
 where
     A: Application + 'static + Send + Sync,
 {
